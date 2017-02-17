@@ -16,6 +16,7 @@ public class NetClient extends AsyncTask<Void, Void, Void>
 {	
 	private String _serverWelcomMessage = "TEST";
 	private int _serverResponseTimeoutMs = 3000;
+	private int _connectionPortNum = 8888;
 	
 	@Override
 	protected Void doInBackground(Void... arg0) 
@@ -83,7 +84,7 @@ public class NetClient extends AsyncTask<Void, Void, Void>
 			try
 			{
 				InetAddress broadcast = interfaceAddress.getBroadcast();
-				DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,broadcast,8888);
+				DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,broadcast, _connectionPortNum);
 				c.send(sendPacket);
 				messageSent = true;
 				Log.d("NetClient", "Broadcast message sent for address " + interfaceAddress.getAddress().toString());
