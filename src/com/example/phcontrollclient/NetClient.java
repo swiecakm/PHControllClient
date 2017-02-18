@@ -78,9 +78,10 @@ public class NetClient extends AsyncTask<Void, Void, InetAddress>
 	private void broadcastToAllInterfaceAddresses(byte[] sendData, NetworkInterface networkInterface)
 			throws NetClientBroadcastException
 	{
+		DatagramSocket c = null;
 		try
 		{
-			DatagramSocket c = new DatagramSocket(null);
+			c = new DatagramSocket(null);
 			c.setSoTimeout(_serverResponseTimeoutMs);
 			
 			boolean messageSent = false;
@@ -99,6 +100,13 @@ public class NetClient extends AsyncTask<Void, Void, InetAddress>
 		catch (SocketException e)
 		{
 			throw new NetClientBroadcastException("Creating socket exception: " + e.getMessage());
+		}
+		finally
+		{
+			if(c != null)
+			{
+				c.close();
+			}
 		}
 	}
 
@@ -124,10 +132,11 @@ public class NetClient extends AsyncTask<Void, Void, InetAddress>
 	
 	private DatagramPacket getServerResponse() throws NetClientServerResponseException
 	{
+		DatagramSocket c = null;
 		DatagramPacket packet;
 		try
 		{
-			DatagramSocket c = new DatagramSocket(_connectionPortNum);
+			c = new DatagramSocket(_connectionPortNum);
 			c.setSoTimeout(_serverResponseTimeoutMs);
 			
 			byte[] respondBuff = new byte[100];
@@ -141,6 +150,13 @@ public class NetClient extends AsyncTask<Void, Void, InetAddress>
 		catch(IOException e)
 		{
 			throw new NetClientServerResponseException("Receiving server response error: " + e.getMessage());
+		}
+		finally
+		{
+			if(c != null)
+			{
+				c.close();
+			}
 		}
 		
 		return packet;
