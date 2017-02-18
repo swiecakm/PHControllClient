@@ -15,19 +15,20 @@ import java.util.Enumeration;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class NetClient extends AsyncTask<Void, Void, Void>
+public class NetClient extends AsyncTask<Void, Void, InetAddress>
 {	
 	private String _serverWelcomMessage = "TEST_WELCOME";
 	private int _serverResponseTimeoutMs = 10000;
 	private int _connectionPortNum = 8888;
 	
 	@Override
-	protected Void doInBackground(Void... arg0) 
+	protected InetAddress doInBackground(Void... arg0) 
 	{	
 		Log.d("NetClient", "async started");	
+		InetAddress serverAddress = null;
 		try
 		{
-			InetAddress serverAddress = getServerAddress();
+			serverAddress = getServerAddress();
 			Log.d("NetClient", "Server address: " + serverAddress);
 		}
 		catch (NetClientBroadcastException e)
@@ -39,7 +40,7 @@ public class NetClient extends AsyncTask<Void, Void, Void>
 			Log.d("NetClient", "Getting server response exception: " + e.getMessage());
 		}
 
-		return null;
+		return serverAddress;
 	}
 
 	private InetAddress getServerAddress() throws NetClientBroadcastException, NetClientServerResponseException 
@@ -143,6 +144,11 @@ public class NetClient extends AsyncTask<Void, Void, Void>
 		}
 		
 		return packet;
+	}
+	
+	@Override
+	protected void onPostExecute(InetAddress result) {
+	    super.onPostExecute(result);
 	}
 }
 

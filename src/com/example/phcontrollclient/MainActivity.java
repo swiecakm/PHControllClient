@@ -13,6 +13,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
+import java.util.concurrent.ExecutionException;
 
 import com.example.phcontrollclient.R;
 
@@ -24,10 +25,33 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		
 		EditText textFirstName = (EditText) findViewById(R.id.editText1);
-		textFirstName.setText("Test message");
+		textFirstName.setText("Welcome!");
 		
+		InetAddress serverAddress = null;
 		NetClient phClient = new NetClient();
 		phClient.execute();
+		try
+		{
+			serverAddress = phClient.get();
+		}
+		catch (InterruptedException e)
+		{
+			Log.d("MainActivity","Cannot find server address because thread was interrupted: " + e.getMessage());
+		}
+		catch (ExecutionException e)
+		{
+			Log.d("MainActivity","Cannot find server address: " + e.getMessage());
+		}
+		
+		if(serverAddress != null)
+		{
+			Log.d("MainActivity","Server address found: " + serverAddress);
+			textFirstName.setText("Server address: " + serverAddress.toString().trim());
+		}
+		else
+		{
+			Log.d("MainActivity","Server address not found!");
+		}
 	}
 
 	@Override
