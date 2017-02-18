@@ -12,16 +12,29 @@
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:text="@string/server_ip_label" />
 
     <EditText
         android:id="@+id/editText1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/textView1"
-        android:layout_centerVertical="true"
+        android:layout_below="@+id/textView1"
         android:ems="10"
         android:inputType="textMultiLine"
-        android:text="@string/app_name" />
+        android:text="@string/app_name" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editText1"
+        android:layout_marginTop="156dp"
+        android:layout_toRightOf="@+id/textView1"
+        android:text="Connect"
+        android:onClick="onConnectButtonClick" />
 
 </RelativeLayout>

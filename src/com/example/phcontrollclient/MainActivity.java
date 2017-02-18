@@ -1,10 +1,13 @@
 package com.example.phcontrollclient;
 
 import android.app.Activity;
+import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 import java.io.IOException;
@@ -25,33 +28,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		
 		EditText textFirstName = (EditText) findViewById(R.id.editText1);
-		textFirstName.setText("Welcome!");
-		
-		InetAddress serverAddress = null;
-		NetClient phClient = new NetClient();
-		phClient.execute();
-		try
-		{
-			serverAddress = phClient.get();
-		}
-		catch (InterruptedException e)
-		{
-			Log.d("MainActivity","Cannot find server address because thread was interrupted: " + e.getMessage());
-		}
-		catch (ExecutionException e)
-		{
-			Log.d("MainActivity","Cannot find server address: " + e.getMessage());
-		}
-		
-		if(serverAddress != null)
-		{
-			Log.d("MainActivity","Server address found: " + serverAddress);
-			textFirstName.setText("Server address: " + serverAddress.toString().trim());
-		}
-		else
-		{
-			Log.d("MainActivity","Server address not found!");
-		}
+		textFirstName.setText("-");	
 	}
 
 	@Override
@@ -72,5 +49,36 @@ public class MainActivity extends Activity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	public void onConnectButtonClick(View view)
+	{
+		EditText textFirstName = (EditText) findViewById(R.id.editText1);
+		
+		InetAddress serverAddress = null;
+		NetClient phClient = new NetClient();
+		phClient.execute();
+		try
+		{
+			serverAddress = phClient.get();
+		}
+		catch (InterruptedException e)
+		{
+			Log.d("MainActivity","Cannot find server address because thread was interrupted: " + e.getMessage());
+		}
+		catch (ExecutionException e)
+		{
+			Log.d("MainActivity","Cannot find server address: " + e.getMessage());
+		}
+		
+		if(serverAddress != null)
+		{
+			Log.d("MainActivity","Server address found: " + serverAddress);
+			textFirstName.setText(serverAddress.toString().trim());
+		}
+		else
+		{
+			Log.d("MainActivity","Server address not found!");
+		}
 	}
 }
