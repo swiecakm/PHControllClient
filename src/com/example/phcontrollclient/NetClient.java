@@ -27,13 +27,8 @@ public class NetClient extends AsyncTask<Void, Void, Void>
 		Log.d("NetClient", "async started");	
 		try
 		{
-			DatagramPacket serverResponse = getServerConnection();
-			Log.d("NetClient", "Server response: " + new String(serverResponse.getData()).trim());
-			Log.d("NetClient", "Server address: " + serverResponse.getAddress());
-		}
-		catch (SocketException e)
-		{
-			Log.d("NetClient", "Find sever exception: Problem with socket: " + e.getMessage());
+			InetAddress serverAddress = getServerAddress();
+			Log.d("NetClient", "Server address: " + serverAddress);
 		}
 		catch (NetClientBroadcastException e)
 		{
@@ -43,19 +38,15 @@ public class NetClient extends AsyncTask<Void, Void, Void>
 		{
 			Log.d("NetClient", "Getting server response exception: " + e.getMessage());
 		}
-		catch (UnknownHostException e)
-		{
-			Log.d("NetClient", "Getting server response exception: " + e.getMessage());
-		}
+
 		return null;
 	}
 
-	private DatagramPacket getServerConnection() throws NetClientBroadcastException, NetClientServerResponseException, SocketException, UnknownHostException 
+	private InetAddress getServerAddress() throws NetClientBroadcastException, NetClientServerResponseException 
 	{
 		sendBroadcastMessage(_serverWelcomMessage.getBytes());
 		DatagramPacket serverResponse = getServerResponse();
-		
-		return serverResponse;
+		return serverResponse.getAddress();
 	}
 
 	private void sendBroadcastMessage( byte[] sendData) throws NetClientBroadcastException
