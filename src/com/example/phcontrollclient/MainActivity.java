@@ -1,21 +1,13 @@
 package com.example.phcontrollclient;
 
 import android.app.Activity;
-import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.SocketException;
 import java.util.concurrent.ExecutionException;
 
 import com.example.phcontrollclient.R;
