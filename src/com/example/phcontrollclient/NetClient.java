@@ -12,39 +12,28 @@ import java.util.Enumeration;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class NetClient extends AsyncTask<Void, Void, InetAddress>
+public class NetClient
 {	
 	private String _serverWelcomMessage = "TEST_WELCOME";
 	private int _serverResponseTimeoutMs = 10000;
-	private int _connectionPortNum = 8888;
+	private int _connectionPortNum;
+	private InetAddress _connectionServerAddress;
 	
-	@Override
-	protected InetAddress doInBackground(Void... arg0) 
-	{	
-		Log.d("NetClient", "async started");	
-		InetAddress serverAddress = null;
-		try
-		{
-			serverAddress = getServerAddress();
-			Log.d("NetClient", "Server address: " + serverAddress);
-		}
-		catch (NetClientBroadcastException e)
-		{
-			Log.d("NetClient", "Broadcast to all addresses exception: " + e.getMessage());
-		}
-		catch (NetClientServerResponseException e)
-		{
-			Log.d("NetClient", "Getting server response exception: " + e.getMessage());
-		}
-
-		return serverAddress;
+	public NetClient(int portNum)
+	{
+		_connectionPortNum = portNum;
 	}
-
-	private InetAddress getServerAddress() throws NetClientBroadcastException, NetClientServerResponseException 
+	
+	public void initialize() throws NetClientBroadcastException, NetClientServerResponseException 
 	{
 		sendBroadcastMessage(_serverWelcomMessage.getBytes());
 		DatagramPacket serverResponse = getServerResponse();
-		return serverResponse.getAddress();
+		_connectionServerAddress = serverResponse.getAddress();
+	}
+	
+	public String getServerAddress()
+	{
+		return _connectionServerAddress.getHostAddress();
 	}
 
 	private void sendBroadcastMessage( byte[] sendData) throws NetClientBroadcastException
@@ -157,11 +146,6 @@ public class NetClient extends AsyncTask<Void, Void, InetAddress>
 		}
 		
 		return packet;
-	}
-	
-	@Override
-	protected void onPostExecute(InetAddress result) {
-	    super.onPostExecute(result);
 	}
 }
 

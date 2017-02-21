@@ -14,6 +14,8 @@ import com.example.phcontrollclient.R;
 
 public class MainActivity extends Activity {
 
+	private NetClient connectionClient = null;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -47,12 +49,11 @@ public class MainActivity extends Activity {
 	{
 		EditText textFirstName = (EditText) findViewById(R.id.editText1);
 		
-		InetAddress serverAddress = null;
-		NetClient phClient = new NetClient();
-		phClient.execute();
+		ConnectServerTask connectionTask = new ConnectServerTask();
+		connectionTask.execute();
 		try
 		{
-			serverAddress = phClient.get();
+			connectionClient = connectionTask.get();
 		}
 		catch (InterruptedException e)
 		{
@@ -63,10 +64,10 @@ public class MainActivity extends Activity {
 			Log.d("MainActivity","Cannot find server address: " + e.getMessage());
 		}
 		
-		if(serverAddress != null)
+		if(connectionClient != null)
 		{
-			Log.d("MainActivity","Server address found: " + serverAddress);
-			textFirstName.setText(serverAddress.toString().trim());
+			Log.d("MainActivity","Connected with server with address: " + connectionClient.getServerAddress());
+			textFirstName.setText(connectionClient.getServerAddress());
 		}
 		else
 		{
