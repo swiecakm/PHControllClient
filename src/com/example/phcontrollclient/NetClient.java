@@ -9,7 +9,6 @@ import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
-import android.os.AsyncTask;
 import android.util.Log;
 
 public class NetClient

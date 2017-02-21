@@ -1,12 +1,10 @@
 package com.example.phcontrollclient;
 
-import java.net.InetAddress;
 import android.os.AsyncTask;
 import android.util.Log;
 
 public class ConnectServerTask extends AsyncTask<Void, Void, NetClient>
 {
-
 	private int _connectionPortNum = 8888;
 	
 	@Override
