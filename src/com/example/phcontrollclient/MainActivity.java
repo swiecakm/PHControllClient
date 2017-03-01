@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import java.util.concurrent.ExecutionException;
 
@@ -14,6 +15,8 @@ import com.example.phcontrollclient.R;
 public class MainActivity extends Activity
 {
 	private NetClient connectionClient = null;
+	Button volUpButton;
+	Button volDownButton;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -23,6 +26,11 @@ public class MainActivity extends Activity
 		
 		EditText textFirstName = (EditText) findViewById(R.id.editText1);
 		textFirstName.setText("-");	
+
+		volUpButton = (Button) findViewById(R.id.button2);
+		volDownButton = (Button) findViewById(R.id.button3);
+		volUpButton.setEnabled(false);
+		volDownButton.setEnabled(false);
 	}
 
 	@Override
@@ -31,7 +39,6 @@ public class MainActivity extends Activity
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
-
 	}
 
 	@Override
@@ -47,6 +54,18 @@ public class MainActivity extends Activity
 		return super.onOptionsItemSelected(item);
 	}
 	
+	public void onVolUpButtonClick(View view)
+	{
+		SendMessageTask sendTask = new SendMessageTask(connectionClient,"UP");
+		sendTask.execute();
+	}
+	
+	public void onVolDownButtonClick(View view)
+	{
+		SendMessageTask sendTask = new SendMessageTask(connectionClient,"DOWN");
+		sendTask.execute();
+	}
+		
 	public void onConnectButtonClick(View view)
 	{
 		EditText textFirstName = (EditText) findViewById(R.id.editText1);
@@ -70,10 +89,14 @@ public class MainActivity extends Activity
 		{
 			Log.d("MainActivity","Connected with server with address: " + connectionClient.getServerAddress());
 			textFirstName.setText(connectionClient.getServerAddress());
+			
+			volUpButton.setEnabled(true);
+			volDownButton.setEnabled(true);
 		}
 		else
 		{
 			Log.d("MainActivity","Server address not found!");
 		}
+		
 	}
 }

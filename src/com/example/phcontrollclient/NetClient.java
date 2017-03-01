@@ -5,9 +5,12 @@ import java.io.InterruptedIOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
+import java.net.SocketAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 import android.util.Log;
 
@@ -33,6 +36,41 @@ public class NetClient
 	public String getServerAddress()
 	{
 		return _connectionServerAddress.getHostAddress();
+	}
+	
+	
+	public void sendMessageToServer(String message) throws Exception
+	{
+		if(_connectionServerAddress == null)
+		{
+			throw new NetClientServerNotConnectedException("Initialize connection before sending message");
+		}
+		
+		byte[] sentMessage = message.getBytes();
+		DatagramPacket packet = new DatagramPacket(sentMessage, sentMessage.length,
+				_connectionServerAddress, _connectionPortNum);
+
+		DatagramSocket dsocket = null;
+		try
+		{
+			dsocket = new DatagramSocket(_connectionPortNum);
+			dsocket.send(packet);
+		}
+		catch (SocketException e)
+		{
+			throw new Exception("Cannot send packet: " + e);
+		}
+		catch (IOException e)
+		{
+			throw new Exception("Cannot send packet: " + e);
+		}
+		finally
+		{
+			if(dsocket != null)
+			{
+				dsocket.close();
+			}
+		}
 	}
 
 	private void sendBroadcastMessage( byte[] sendData) throws NetClientBroadcastException
