@@ -14,9 +14,10 @@ import com.example.phcontrollclient.R;
 
 public class MainActivity extends Activity
 {
-	private NetClient connectionClient = null;
-	Button volUpButton;
-	Button volDownButton;
+	private NetClient _connectionClient = null;
+	private Button _volUpButton;
+	private Button _volDownButton;
+	private EditText _textServerAddress;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -24,13 +25,13 @@ public class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		EditText textFirstName = (EditText) findViewById(R.id.editText1);
-		textFirstName.setText("-");	
+		_textServerAddress = (EditText) findViewById(R.id.editText1);
+		_textServerAddress.setText("-");	
 
-		volUpButton = (Button) findViewById(R.id.button2);
-		volDownButton = (Button) findViewById(R.id.button3);
-		volUpButton.setEnabled(false);
-		volDownButton.setEnabled(false);
+		_volUpButton = (Button) findViewById(R.id.button2);
+		_volDownButton = (Button) findViewById(R.id.button3);
+		_volUpButton.setEnabled(false);
+		_volDownButton.setEnabled(false);
 	}
 
 	@Override
@@ -56,22 +57,39 @@ public class MainActivity extends Activity
 	
 	public void onVolUpButtonClick(View view)
 	{
-		SendMessageTask sendTask = new SendMessageTask(connectionClient,"UP");
+		SendMessageTask sendTask = new SendMessageTask(_connectionClient,"UP");
 		sendTask.execute();
 	}
 	
 	public void onVolDownButtonClick(View view)
 	{
-		SendMessageTask sendTask = new SendMessageTask(connectionClient,"DOWN");
+		SendMessageTask sendTask = new SendMessageTask(_connectionClient,"DOWN");
 		sendTask.execute();
 	}
 		
 	public void onConnectButtonClick(View view)
 	{
-		EditText textFirstName = (EditText) findViewById(R.id.editText1);
+		_connectionClient = ConnectWithServer();	
+		if(_connectionClient != null)
+		{
+			Log.d("MainActivity","Connected with server with address: " + _connectionClient.getServerAddress());
+			_textServerAddress.setText(_connectionClient.getServerAddress());
+			
+			_volUpButton.setEnabled(true);
+			_volDownButton.setEnabled(true);
+		}
+		else
+		{
+			Log.d("MainActivity","Server address not found!");
+		}
 		
+	}
+
+	private NetClient ConnectWithServer()
+	{
 		ConnectServerTask connectionTask = new ConnectServerTask();
 		connectionTask.execute();
+		NetClient connectionClient = null;
 		try
 		{
 			connectionClient = connectionTask.get();
@@ -85,18 +103,6 @@ public class MainActivity extends Activity
 			Log.d("MainActivity","Cannot find server address: " + e.getMessage());
 		}
 		
-		if(connectionClient != null)
-		{
-			Log.d("MainActivity","Connected with server with address: " + connectionClient.getServerAddress());
-			textFirstName.setText(connectionClient.getServerAddress());
-			
-			volUpButton.setEnabled(true);
-			volDownButton.setEnabled(true);
-		}
-		else
-		{
-			Log.d("MainActivity","Server address not found!");
-		}
-		
+		return connectionClient;
 	}
 }
