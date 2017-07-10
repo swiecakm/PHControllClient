@@ -20,10 +20,17 @@ public class ConnectServerTask extends AsyncTask<Void, Void, NetClient>
         catch (NetClientBroadcastException e)
         {
             Log.d("NetClient", "Broadcast to all addresses exception: " + e.getMessage());
+            return null;
         }
         catch (NetClientServerResponseException e)
         {
             Log.d("NetClient", "Getting server response exception: " + e.getMessage());
+            return null;
+        }
+        catch (Exception e)
+        {
+            Log.d("NetClient", String.format("Server initialization exception: %s", e));
+            return null;
         }
 
         return connectionClient;

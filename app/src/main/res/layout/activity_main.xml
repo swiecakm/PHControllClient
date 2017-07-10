@@ -29,7 +29,7 @@
             android:focusableInTouchMode="false"
             android:inputType="none|textMultiLine"
             android:selectAllOnFocus="false"
-            android:text="@string/app_name" >
+            android:text="@string/app_name" android:layout_alignParentEnd="true">
         <requestFocus />
     </EditText>
 

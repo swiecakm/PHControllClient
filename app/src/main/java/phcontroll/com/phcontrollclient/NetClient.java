@@ -25,11 +25,10 @@ public class NetClient
         _connectionPortNum = portNum;
     }
 
-    public void initialize() throws NetClientBroadcastException, NetClientServerResponseException
-    {
+    public void initialize() throws Exception {
         sendBroadcastMessage(_serverWelcomMessage.getBytes());
         DatagramPacket serverResponse = getServerResponse();
-        _connectionServerAddress = serverResponse.getAddress();
+         _connectionServerAddress = serverResponse.getAddress();
     }
 
     public String getServerAddress()
@@ -175,6 +174,10 @@ public class NetClient
         {
             throw new NetClientServerResponseException("Receiving server response error: " + e.getMessage());
         }
+        catch(Exception e)
+        {
+            throw new NetClientServerResponseException("Receiving server response error: " + e);
+        }
         finally
         {
             if(c != null)
@@ -183,6 +186,10 @@ public class NetClient
             }
         }
 
+        if(packet == null)
+        {
+            throw new NetClientServerResponseException("Response from the server is null!");
+        }
         return packet;
     }
 

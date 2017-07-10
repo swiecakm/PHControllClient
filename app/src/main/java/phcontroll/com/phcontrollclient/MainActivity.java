@@ -40,6 +40,25 @@ public class MainActivity extends AppCompatActivity {
         sendTask.execute();
     }
 
+
+    public void onConnectButtonClick(View view) {
+        _connectionClient = initializeConnection();
+        if(_connectionClient != null)
+        {
+            Log.d("MainActivity", String.format("Connected with server with address: %s", _connectionClient.getServerAddress()));
+            _textServerAddress.setText(_connectionClient.getServerAddress());
+
+            _volUpButton.setEnabled(true);
+            _volDownButton.setEnabled(true);
+        }
+        else
+        {
+            Log.d("MainActivity","Server address not found!");
+            _textServerAddress.setText("Server address not found!");
+        }
+
+    }
+
     private NetClient initializeConnection()
     {
         ConnectServerTask connectionTask = new ConnectServerTask();
@@ -57,25 +76,13 @@ public class MainActivity extends AppCompatActivity {
         {
             Log.d("MainActivity","Cannot find server address: " + e.getMessage());
         }
+        catch (Exception e)
+        {
+            Log.d("MainActivity", String.format("Cannot initialize connection because of error: %s", e));
+        }
 
         return connectionClient;
     }
 
 
-    public void onConnectButtonClick(View view) {
-        _connectionClient = initializeConnection();
-        if(_connectionClient != null)
-        {
-            Log.d("MainActivity","Connected with server with address: " + _connectionClient.getServerAddress());
-            _textServerAddress.setText(_connectionClient.getServerAddress());
-
-            _volUpButton.setEnabled(true);
-            _volDownButton.setEnabled(true);
-        }
-        else
-        {
-            Log.d("MainActivity","Server address not found!");
-        }
-
-    }
 }
