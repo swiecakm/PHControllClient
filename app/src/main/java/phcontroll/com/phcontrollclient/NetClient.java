@@ -5,15 +5,11 @@ import java.io.InterruptedIOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
-import java.net.SocketAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.Enumeration;
 import android.util.Log;
-import android.view.View;
 
 import static java.net.NetworkInterface.getNetworkInterfaces;
 
