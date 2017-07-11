@@ -1,5 +1,7 @@
 package phcontroll.com.phcontrollclient;
 
+import android.content.Context;
+import android.net.wifi.WifiManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -52,6 +54,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void onConnectButtonClick(View view) {
         try{
+            WifiManager wifi = (WifiManager)getSystemService(Context.WIFI_SERVICE);
+            if (!wifi.isWifiEnabled()){
+                _textServerAddress.setText("Wifi is not enabled!");
+                throw new Exception("Wifi is not enabled!");
+            }
             ConnectWithServer();
         }
         catch (InterruptedException e)
