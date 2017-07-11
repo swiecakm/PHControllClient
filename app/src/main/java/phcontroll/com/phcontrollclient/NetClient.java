@@ -9,6 +9,9 @@ import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+
 import android.util.Log;
 
 import static java.net.NetworkInterface.getNetworkInterfaces;
@@ -37,37 +40,25 @@ public class NetClient
     }
 
 
-    public void sendMessageToServer(String message) throws Exception
-    {
+    public void sendMessageToServer(String message) throws NetClientServerNotConnectedException, NetClientBroadcastException {
         if(_connectionServerAddress == null)
         {
             throw new NetClientServerNotConnectedException("Initialize connection before sending message");
         }
 
         byte[] sentMessage = message.getBytes();
-        DatagramPacket packet = new DatagramPacket(sentMessage, sentMessage.length,
-                _connectionServerAddress, _connectionPortNum);
-
-        DatagramSocket dsocket = null;
-        try
+        try(DatagramSocket dSocket = new DatagramSocket(_connectionPortNum);)
         {
-            dsocket = new DatagramSocket(_connectionPortNum);
-            dsocket.send(packet);
+            DatagramPacket packet = new DatagramPacket(sentMessage, sentMessage.length, _connectionServerAddress, _connectionPortNum);
+            dSocket.send(packet);
         }
         catch (SocketException e)
         {
-            throw new Exception("Cannot send packet: " + e);
+            throw new NetClientBroadcastException(String.format("Cannot send packet because of socket error: %s", e));
         }
         catch (IOException e)
         {
-            throw new Exception("Cannot send packet: " + e);
-        }
-        finally
-        {
-            if(dsocket != null)
-            {
-                dsocket.close();
-            }
+            throw new NetClientBroadcastException(String.format("Cannot send packet because of IO error: %s", e));
         }
     }
 
@@ -75,20 +66,7 @@ public class NetClient
     {
         try
         {
-            Enumeration<NetworkInterface> interfaces = getNetworkInterfaces();
-            while (interfaces.hasMoreElements())
-            {
-                NetworkInterface networkInterface = interfaces.nextElement();
-                if (!networkInterface.getDisplayName().startsWith("wlan"))
-                {
-                    continue;
-                }
-                if (!networkInterface.isUp())
-                {
-                    throw new NetClientBroadcastException("Wifi is not enabled");
-                }
-                broadcastToAllInterfaceAddresses(sendData, networkInterface);
-            }
+            BroadcastToAllWlanInterfaces(sendData);
         }
         catch (SocketException e)
         {
@@ -96,59 +74,57 @@ public class NetClient
         }
     }
 
+    private void BroadcastToAllWlanInterfaces(byte[] sendData) throws SocketException, NetClientBroadcastException {
+        Enumeration<NetworkInterface> interfaces = getNetworkInterfaces();
+        while (interfaces.hasMoreElements())
+        {
+            NetworkInterface networkInterface = interfaces.nextElement();
+            if (networkInterface.getDisplayName().startsWith("wlan")) {
+                broadcastToAllInterfaceAddresses(sendData, networkInterface);
+            }
+        }
+    }
+
     private void broadcastToAllInterfaceAddresses(byte[] sendData, NetworkInterface networkInterface)
             throws NetClientBroadcastException
     {
-        DatagramSocket c = null;
-        try
+        try(DatagramSocket c  = new DatagramSocket(null))
         {
-            c = new DatagramSocket(null);
             c.setSoTimeout(_serverResponseTimeoutMs);
-
-            boolean messageSent = false;
-            for(InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses())
-            {
-                if(sendMessageToInterfaceAddress(sendData, c, messageSent, interfaceAddress))
-                {
-                    messageSent = true;
-                }
-            }
-            if (!messageSent)
+            List<InterfaceAddress> addresses = networkInterface.getInterfaceAddresses();
+            Log.d("NetClient", String.format("%d addresses found", addresses.size()));
+            if (!sendMessagesThroughIteratorElements(false, sendData, c,  addresses.iterator()))
             {
                 throw new NetClientBroadcastException("Broadcast message not sent to any address");
             }
         }
         catch (SocketException e)
         {
-            throw new NetClientBroadcastException("Creating socket exception: " + e.getMessage());
-        }
-        finally
-        {
-            if(c != null)
-            {
-                c.close();
-            }
+            throw new NetClientBroadcastException(String.format("Socket initialization exception: %s", e.getMessage()));
         }
     }
 
-    private boolean sendMessageToInterfaceAddress(byte[] sendData, DatagramSocket c, boolean messageSent,
-                                                  InterfaceAddress interfaceAddress)
+    private boolean sendMessagesThroughIteratorElements(boolean atLeastOneSent, byte[] sendData, DatagramSocket c, Iterator<InterfaceAddress> iterator)
     {
-        try
+        if(iterator.hasNext())
         {
+            InterfaceAddress address = iterator.next();
+            try {
+                sendMessageToInterfaceAddress(sendData, c, address);
+                Log.d("NetClient", String.format("Broadcast message sent for address %s", address.getAddress().toString()));
+                atLeastOneSent = sendMessagesThroughIteratorElements(true, sendData, c, iterator);
+            } catch (Exception e) {
+                Log.d("Net Client", String.format("Can not send the message to address %s because of error: %s", address.getAddress().toString(), e));
+                atLeastOneSent = sendMessagesThroughIteratorElements(atLeastOneSent, sendData, c, iterator);
+            }
+        }
+        return atLeastOneSent;
+    }
+
+    private void sendMessageToInterfaceAddress(byte[] sendData, DatagramSocket c, InterfaceAddress interfaceAddress) throws IOException {
             InetAddress broadcast = interfaceAddress.getBroadcast();
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,broadcast, _connectionPortNum);
             c.send(sendPacket);
-            Log.d("NetClient", "Broadcast message sent for address " + interfaceAddress.getAddress().toString());
-
-            return true;
-        }
-        catch (Exception e)
-        {
-            Log.d("NetClient", "Sending broadcast package error for address " + interfaceAddress.getAddress().toString() +
-                    ": " + e.getMessage());
-            return false;
-        }
     }
 
     private DatagramPacket getServerResponse() throws NetClientServerResponseException
@@ -163,15 +139,15 @@ public class NetClient
         }
         catch(InterruptedIOException e)
         {
-            throw new NetClientServerResponseException("Waiting for server too long: " + e.getMessage());
+            throw new NetClientServerResponseException(String.format("Waiting for server too long: %s", e.getMessage()));
         }
         catch(IOException e)
         {
-            throw new NetClientServerResponseException("Receiving server response error: " + e.getMessage());
+            throw new NetClientServerResponseException(String.format("Receiving server response error: %s", e.getMessage()));
         }
         catch(Exception e)
         {
-            throw new NetClientServerResponseException("Receiving server response error: " + e);
+            throw new NetClientServerResponseException(String.format("Receiving server response error: %s", e));
         }
     }
 
