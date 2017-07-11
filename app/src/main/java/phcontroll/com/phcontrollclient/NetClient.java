@@ -75,6 +75,7 @@ public class NetClient
     {
         try
         {
+
             Enumeration<NetworkInterface> interfaces = getNetworkInterfaces();
             while (interfaces.hasMoreElements())
             {

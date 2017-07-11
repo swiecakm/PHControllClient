@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void InitializeUIComponents() {
         _textServerAddress = (EditText) findViewById(R.id.serverAddressText);
-        _textServerAddress.setText("-");
+        _textServerAddress.setText("Not connected with server");
         _volUpButton = (Button) findViewById(R.id.volUpButton);
         _volDownButton = (Button) findViewById(R.id.volDownButton);
         _volUpButton.setEnabled(false);
@@ -57,10 +57,6 @@ public class MainActivity extends AppCompatActivity {
         catch (InterruptedException e)
         {
             Log.d("MainActivity","Cannot find server address because thread was interrupted: " + e.getMessage());
-        }
-        catch (ExecutionException e)
-        {
-            Log.d("MainActivity","Cannot find server address: " + e.getMessage());
         }
         catch (Exception e)
         {
