@@ -19,11 +19,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        _textServerAddress = (EditText) findViewById(R.id.editText1);
+        _textServerAddress = (EditText) findViewById(R.id.serverAddressText);
         _textServerAddress.setText("-");
 
-        _volUpButton = (Button) findViewById(R.id.button2);
-        _volDownButton = (Button) findViewById(R.id.button3);
+        _volUpButton = (Button) findViewById(R.id.volUpButton);
+        _volDownButton = (Button) findViewById(R.id.volDownButton);
         _volUpButton.setEnabled(false);
         _volDownButton.setEnabled(false);
     }

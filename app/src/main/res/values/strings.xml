@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">PHControllClient</string>
-    <string name="server_ip_label">-</string>
+    <string name="server_ip_label">Server address</string>
 </resources>
