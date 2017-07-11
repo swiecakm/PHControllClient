@@ -18,10 +18,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        InitializeUIComponents();
+    }
 
+    private void InitializeUIComponents() {
         _textServerAddress = (EditText) findViewById(R.id.serverAddressText);
         _textServerAddress.setText("-");
-
         _volUpButton = (Button) findViewById(R.id.volUpButton);
         _volDownButton = (Button) findViewById(R.id.volDownButton);
         _volUpButton.setEnabled(false);
@@ -49,31 +51,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onConnectButtonClick(View view) {
-        _connectionClient = initializeConnection();
-        if(_connectionClient != null)
-        {
-            Log.d("MainActivity", String.format("Connected with server with address: %s", _connectionClient.getServerAddress()));
-            _textServerAddress.setText(_connectionClient.getServerAddress());
-
-            _volUpButton.setEnabled(true);
-            _volDownButton.setEnabled(true);
-        }
-        else
-        {
-            Log.d("MainActivity","Server address not found!");
-            _textServerAddress.setText("Server address not found!");
-        }
-
-    }
-
-    private NetClient initializeConnection()
-    {
-        ConnectServerTask connectionTask = new ConnectServerTask();
-        connectionTask.execute();
-        NetClient connectionClient = null;
         try
         {
-            connectionClient = connectionTask.get();
+            _connectionClient = initializeConnection();
+            if(_connectionClient != null)
+            {
+                Log.d("MainActivity", String.format("Connected with server with address: %s", _connectionClient.getServerAddress()));
+                _textServerAddress.setText(_connectionClient.getServerAddress());
+                _volUpButton.setEnabled(true);
+                _volDownButton.setEnabled(true);
+            }
+            else
+            {
+                Log.d("MainActivity","Server address not found!");
+                _textServerAddress.setText("Server address not found!");
+            }
         }
         catch (InterruptedException e)
         {
@@ -87,8 +79,12 @@ public class MainActivity extends AppCompatActivity {
         {
             Log.d("MainActivity", String.format("Cannot initialize connection because of error: %s", e));
         }
+    }
 
-        return connectionClient;
+    private NetClient initializeConnection() throws ExecutionException, InterruptedException {
+        ConnectServerTask connectionTask = new ConnectServerTask();
+        connectionTask.execute();
+        return connectionTask.get();
     }
 
 
