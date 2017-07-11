@@ -75,7 +75,6 @@ public class NetClient
     {
         try
         {
-
             Enumeration<NetworkInterface> interfaces = getNetworkInterfaces();
             while (interfaces.hasMoreElements())
             {
@@ -154,16 +153,13 @@ public class NetClient
 
     private DatagramPacket getServerResponse() throws NetClientServerResponseException
     {
-        DatagramSocket c = null;
-        DatagramPacket packet;
-        try
+        try(DatagramSocket c = new DatagramSocket(_connectionPortNum))
         {
-            c = new DatagramSocket(_connectionPortNum);
             c.setSoTimeout(_serverResponseTimeoutMs);
-
             byte[] respondBuff = new byte[100];
-            packet = new DatagramPacket(respondBuff, respondBuff.length);
+            DatagramPacket packet = new DatagramPacket(respondBuff, respondBuff.length);
             c.receive(packet);
+            return packet;
         }
         catch(InterruptedIOException e)
         {
@@ -177,19 +173,6 @@ public class NetClient
         {
             throw new NetClientServerResponseException("Receiving server response error: " + e);
         }
-        finally
-        {
-            if(c != null)
-            {
-                c.close();
-            }
-        }
-
-        if(packet == null)
-        {
-            throw new NetClientServerResponseException("Response from the server is null!");
-        }
-        return packet;
     }
 
 }

@@ -1,6 +1,5 @@
 package phcontroll.com.phcontrollclient;
 import android.os.AsyncTask;
-import android.util.Log;
 
 public class ConnectServerTask extends AsyncTask<Void, Void, ConnectServerTaskResult>
 {
