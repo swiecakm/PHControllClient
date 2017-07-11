@@ -8,12 +8,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import java.util.concurrent.ExecutionException;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnConnectionCompleted {
     private NetClient _connectionClient = null;
     private Button _volUpButton;
     private Button _volDownButton;
+    private Button _connectButton;
     private EditText _textServerAddress;
 
     @Override
@@ -25,9 +25,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void InitializeUIComponents() {
         _textServerAddress = (EditText) findViewById(R.id.serverAddressText);
-        _textServerAddress.setText("Not connected with server");
+        _textServerAddress.setText("Click to connect with server");
         _volUpButton = (Button) findViewById(R.id.volUpButton);
         _volDownButton = (Button) findViewById(R.id.volDownButton);
+        _connectButton = (Button) findViewById(R.id.connectButton);
         _volUpButton.setEnabled(false);
         _volDownButton.setEnabled(false);
     }
@@ -53,43 +54,43 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onConnectButtonClick(View view) {
-        try{
-            WifiManager wifi = (WifiManager)getSystemService(Context.WIFI_SERVICE);
-            if (!wifi.isWifiEnabled()){
-                _textServerAddress.setText("Wifi is not enabled!");
-                throw new Exception("Wifi is not enabled!");
-            }
-            ConnectWithServer();
+        WifiManager wifi = (WifiManager)getSystemService(Context.WIFI_SERVICE);
+        if (!wifi.isWifiEnabled()){
+            SetConnectionStatus("Please enable wifi and try again.", true);
         }
-        catch (InterruptedException e)
-        {
-            Log.d("MainActivity","Cannot find server address because thread was interrupted: " + e.getMessage());
-        }
-        catch (Exception e)
-        {
-            Log.d("MainActivity", String.format("Cannot initialize connection because of error: %s", e));
+        else {
+            initializeServerConnection();
         }
     }
 
-    private void ConnectWithServer() throws Exception {
-        ConnectServerTaskResult connectionResult = initializeConnection();
-        if(connectionResult.isConnected())
+    private void initializeServerConnection(){
+        _textServerAddress.setText("Connecting with server...");
+        _connectButton.setEnabled(false);
+        ConnectServerTask connectionTask = new ConnectServerTask(this);
+        connectionTask.execute();
+    }
+
+    @Override
+    public void onConnectionCompleted(ConnectServerTaskResult result) {
+        if(result.isConnected())
         {
-            _connectionClient = connectionResult.getServerConnection();
+            _connectionClient = result.getServerConnection();
+            SetConnectionStatus(String.format("Connected with IP: %s", _connectionClient.getServerAddress()), true);
             Log.d("MainActivity", String.format("Connected with server with address: %s", _connectionClient.getServerAddress()));
-            _textServerAddress.setText(_connectionClient.getServerAddress());
-            _volUpButton.setEnabled(true);
-            _volDownButton.setEnabled(true);
         }
         else
-            throw connectionResult.getConnectionException();
+        {
+            SetConnectionStatus("Could not connect. Please try again.", false);
+            Log.d("MainActivity", String.format("Not connected with server because of error: %s", result.getConnectionException()));
+        }
+        _connectButton.setEnabled(true);
     }
 
-    private ConnectServerTaskResult initializeConnection() throws ExecutionException, InterruptedException {
-        ConnectServerTask connectionTask = new ConnectServerTask();
-        connectionTask.execute();
-        return connectionTask.get();
+    private void SetConnectionStatus(String message, Boolean volumeButtonsEnabled)
+    {
+        _textServerAddress.setText(message);
+        _volUpButton.setEnabled(volumeButtonsEnabled);
+        _volDownButton.setEnabled(volumeButtonsEnabled);
     }
-
 
 }

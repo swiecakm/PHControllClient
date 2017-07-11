@@ -4,6 +4,12 @@ import android.os.AsyncTask;
 public class ConnectServerTask extends AsyncTask<Void, Void, ConnectServerTaskResult>
 {
     private int _connectionPortNum = 8888;
+    private OnConnectionCompleted _listener;
+
+    public ConnectServerTask(OnConnectionCompleted listener)
+    {
+        _listener = listener;
+    }
 
     @Override
     protected ConnectServerTaskResult doInBackground(Void... arg0)
@@ -21,6 +27,6 @@ public class ConnectServerTask extends AsyncTask<Void, Void, ConnectServerTaskRe
 
     @Override
     protected void onPostExecute(ConnectServerTaskResult result) {
-        super.onPostExecute(result);
+        _listener.onConnectionCompleted(result);
     }
 }
