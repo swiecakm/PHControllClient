@@ -75,12 +75,10 @@ public class NetClient
     {
         try
         {
-            Log.d("NetClient", "Reading interfaces");
             Enumeration<NetworkInterface> interfaces = getNetworkInterfaces();
             while (interfaces.hasMoreElements())
             {
                 NetworkInterface networkInterface = interfaces.nextElement();
-                Log.d("NetClient", "interface " + networkInterface.getDisplayName());
                 if (!networkInterface.getDisplayName().startsWith("wlan"))
                 {
                     continue;
