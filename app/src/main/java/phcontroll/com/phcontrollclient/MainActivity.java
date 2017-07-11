@@ -30,16 +30,23 @@ public class MainActivity extends AppCompatActivity {
 
     public void onVolUpButtonClick(View view)
     {
-        SendMessageTask sendTask = new SendMessageTask(_connectionClient,"UP");
-        sendTask.execute();
+        sendCommandToServer("UP");
     }
 
     public void onVolDownButtonClick(View view)
     {
-        SendMessageTask sendTask = new SendMessageTask(_connectionClient,"DOWN");
-        sendTask.execute();
+        sendCommandToServer("DOWN");
     }
 
+    public void sendCommandToServer(String message)
+    {
+        if(_connectionClient !=null) {
+            SendMessageTask sendTask = new SendMessageTask(_connectionClient, message);
+            sendTask.execute();
+        }
+        else
+            Log.d("MainActivity", "No server to send a command!");
+    }
 
     public void onConnectButtonClick(View view) {
         _connectionClient = initializeConnection();
