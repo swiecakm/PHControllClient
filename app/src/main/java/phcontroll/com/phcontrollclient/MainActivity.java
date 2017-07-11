@@ -47,25 +47,12 @@ public class MainActivity extends AppCompatActivity {
             sendTask.execute();
         }
         else
-            Log.d("MainActivity", "No server to send a command!");
+            Log.d("MainActivity", "Connect with server before sending command!");
     }
 
     public void onConnectButtonClick(View view) {
-        try
-        {
-            _connectionClient = initializeConnection();
-            if(_connectionClient != null)
-            {
-                Log.d("MainActivity", String.format("Connected with server with address: %s", _connectionClient.getServerAddress()));
-                _textServerAddress.setText(_connectionClient.getServerAddress());
-                _volUpButton.setEnabled(true);
-                _volDownButton.setEnabled(true);
-            }
-            else
-            {
-                Log.d("MainActivity","Server address not found!");
-                _textServerAddress.setText("Server address not found!");
-            }
+        try{
+            ConnectWithServer();
         }
         catch (InterruptedException e)
         {
@@ -81,7 +68,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private NetClient initializeConnection() throws ExecutionException, InterruptedException {
+    private void ConnectWithServer() throws Exception {
+        ConnectServerTaskResult connectionResult = initializeConnection();
+        if(connectionResult.isConnected())
+        {
+            _connectionClient = connectionResult.getServerConnection();
+            Log.d("MainActivity", String.format("Connected with server with address: %s", _connectionClient.getServerAddress()));
+            _textServerAddress.setText(_connectionClient.getServerAddress());
+            _volUpButton.setEnabled(true);
+            _volDownButton.setEnabled(true);
+        }
+        else
+            throw connectionResult.getConnectionException();
+    }
+
+    private ConnectServerTaskResult initializeConnection() throws ExecutionException, InterruptedException {
         ConnectServerTask connectionTask = new ConnectServerTask();
         connectionTask.execute();
         return connectionTask.get();
