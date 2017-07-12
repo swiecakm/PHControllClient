@@ -2,8 +2,8 @@ package phcontroll.com.phcontrollclient;
 
 import android.content.Context;
 import android.net.wifi.WifiManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -34,37 +34,32 @@ public class MainActivity extends AppCompatActivity implements OnConnectionCompl
         _serverAddressText.setText("Click to connect with server");
     }
 
-    public void onVolUpButtonClick(View view)
-    {
+    public void onVolUpButtonClick(View view) {
         sendCommandToServer("UP");
     }
 
-    public void onVolDownButtonClick(View view)
-    {
+    public void onVolDownButtonClick(View view) {
         sendCommandToServer("DOWN");
     }
 
-    public void sendCommandToServer(String message)
-    {
-        if(_connectionClient !=null) {
+    public void sendCommandToServer(String message) {
+        if (_connectionClient != null) {
             SendMessageTask sendTask = new SendMessageTask(_connectionClient, message);
             sendTask.execute();
-        }
-        else
+        } else
             Log.d("MainActivity", "Connect with server before sending command!");
     }
 
     public void onConnectButtonClick(View view) {
-        WifiManager wifi = (WifiManager)getSystemService(Context.WIFI_SERVICE);
-        if (!wifi.isWifiEnabled()){
+        WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        if (!wifi.isWifiEnabled()) {
             SetConnectionStatus("Please enable wifi and try again.", false);
-        }
-        else {
+        } else {
             initializeServerConnection();
         }
     }
 
-    private void initializeServerConnection(){
+    private void initializeServerConnection() {
         _serverAddressText.setText("Connecting with server...");
         _connectButton.setEnabled(false);
         ConnectServerTask connectionTask = new ConnectServerTask(this);
@@ -73,22 +68,18 @@ public class MainActivity extends AppCompatActivity implements OnConnectionCompl
 
     @Override
     public void onConnectionCompleted(ConnectServerTaskResult result) {
-        if(result.isConnected())
-        {
+        if (result.isConnected()) {
             _connectionClient = result.getServerConnection();
             SetConnectionStatus(String.format("Connected with IP: %s", _connectionClient.getServerAddress()), true);
             Log.d("MainActivity", String.format("Connected with server with address: %s", _connectionClient.getServerAddress()));
-        }
-        else
-        {
+        } else {
             SetConnectionStatus("Could not connect. Please try again.", false);
             Log.d("MainActivity", String.format("Not connected with server because of error: %s", result.getConnectionException()));
         }
         _connectButton.setEnabled(true);
     }
 
-    private void SetConnectionStatus(String message, Boolean volumeButtonsEnabled)
-    {
+    private void SetConnectionStatus(String message, Boolean volumeButtonsEnabled) {
         _serverAddressText.setText(message);
         _volUpButton.setEnabled(volumeButtonsEnabled);
         _volDownButton.setEnabled(volumeButtonsEnabled);

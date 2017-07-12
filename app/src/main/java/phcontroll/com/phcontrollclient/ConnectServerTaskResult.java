@@ -8,14 +8,12 @@ public class ConnectServerTaskResult {
     private NetClient _serverConnection;
     private Exception _connectionException;
 
-    public ConnectServerTaskResult(NetClient connection)
-    {
+    public ConnectServerTaskResult(NetClient connection) {
         _connected = true;
         _serverConnection = connection;
     }
 
-    public ConnectServerTaskResult(Exception e)
-    {
+    public ConnectServerTaskResult(Exception e) {
         _connected = false;
         _connectionException = e;
     }
@@ -25,21 +23,17 @@ public class ConnectServerTaskResult {
     }
 
     public NetClient getServerConnection() {
-        if(_serverConnection != null)
-        {
+        if (_serverConnection != null) {
             return _serverConnection;
-        }
-        else {
+        } else {
             throw new IllegalStateException("Server connection is null!");
         }
     }
 
     public Exception getConnectionException() {
-        if(_connectionException != null)
-        {
+        if (_connectionException != null) {
             return _connectionException;
-        }
-        else {
+        } else {
             throw new IllegalStateException("Connection exception is null!");
         }
     }
