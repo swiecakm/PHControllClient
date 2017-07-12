@@ -14,7 +14,7 @@ public class MainActivity extends AppCompatActivity implements OnConnectionCompl
     private Button _volUpButton;
     private Button _volDownButton;
     private Button _connectButton;
-    private EditText _textServerAddress;
+    private EditText _serverAddressText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,13 +24,14 @@ public class MainActivity extends AppCompatActivity implements OnConnectionCompl
     }
 
     private void InitializeUIComponents() {
-        _textServerAddress = (EditText) findViewById(R.id.serverAddressText);
-        _textServerAddress.setText("Click to connect with server");
+        _serverAddressText = (EditText) findViewById(R.id.serverAddressText);
         _volUpButton = (Button) findViewById(R.id.volUpButton);
         _volDownButton = (Button) findViewById(R.id.volDownButton);
         _connectButton = (Button) findViewById(R.id.connectButton);
+        _serverAddressText.setKeyListener(null);
         _volUpButton.setEnabled(false);
         _volDownButton.setEnabled(false);
+        _serverAddressText.setText("Click to connect with server");
     }
 
     public void onVolUpButtonClick(View view)
@@ -56,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements OnConnectionCompl
     public void onConnectButtonClick(View view) {
         WifiManager wifi = (WifiManager)getSystemService(Context.WIFI_SERVICE);
         if (!wifi.isWifiEnabled()){
-            SetConnectionStatus("Please enable wifi and try again.", true);
+            SetConnectionStatus("Please enable wifi and try again.", false);
         }
         else {
             initializeServerConnection();
@@ -64,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements OnConnectionCompl
     }
 
     private void initializeServerConnection(){
-        _textServerAddress.setText("Connecting with server...");
+        _serverAddressText.setText("Connecting with server...");
         _connectButton.setEnabled(false);
         ConnectServerTask connectionTask = new ConnectServerTask(this);
         connectionTask.execute();
@@ -88,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements OnConnectionCompl
 
     private void SetConnectionStatus(String message, Boolean volumeButtonsEnabled)
     {
-        _textServerAddress.setText(message);
+        _serverAddressText.setText(message);
         _volUpButton.setEnabled(volumeButtonsEnabled);
         _volDownButton.setEnabled(volumeButtonsEnabled);
     }
