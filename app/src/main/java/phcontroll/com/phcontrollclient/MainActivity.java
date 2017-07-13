@@ -24,10 +24,18 @@ public class MainActivity extends AppCompatActivity implements OnConnectionCompl
     }
 
     private void InitializeUIComponents() {
+        retrieveWidgets();
+        setWidgetsInitialValues();
+    }
+
+    private void retrieveWidgets() {
         _serverAddressText = (EditText) findViewById(R.id.serverAddressText);
         _volUpButton = (Button) findViewById(R.id.volUpButton);
         _volDownButton = (Button) findViewById(R.id.volDownButton);
         _connectButton = (Button) findViewById(R.id.connectButton);
+    }
+
+    private void setWidgetsInitialValues() {
         _serverAddressText.setKeyListener(null);
         _volUpButton.setEnabled(false);
         _volDownButton.setEnabled(false);
