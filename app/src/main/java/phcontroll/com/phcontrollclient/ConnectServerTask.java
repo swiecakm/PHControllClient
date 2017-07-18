@@ -3,7 +3,6 @@ package phcontroll.com.phcontrollclient;
 import android.os.AsyncTask;
 
 public class ConnectServerTask extends AsyncTask<Void, Void, ConnectServerTaskResult> {
-    private int _connectionPortNum = 8888;
     private OnConnectionCompleted _listener;
 
     public ConnectServerTask(OnConnectionCompleted listener) {
@@ -13,8 +12,8 @@ public class ConnectServerTask extends AsyncTask<Void, Void, ConnectServerTaskRe
     @Override
     protected ConnectServerTaskResult doInBackground(Void... arg0) {
         try {
-            NetClient connectionClient = new NetClient(_connectionPortNum);
-            connectionClient.initialize();
+            NetClient connectionClient = new NetClient();
+            connectionClient.pairWithServer();
             return new ConnectServerTaskResult(connectionClient);
         } catch (Exception e) {
             return new ConnectServerTaskResult(e);

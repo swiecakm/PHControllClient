@@ -12,34 +12,32 @@ import java.util.List;
 import static java.net.NetworkInterface.getNetworkInterfaces;
 
 public class NetClient {
-    private String _serverWelcomeMessage = "TEST_WELCOME";
-    private int _serverResponseTimeoutMs = 10000;
-    private int _connectionPortNum;
-    private InetAddress _connectionServerAddress;
+    private ConnectionSettings _settings = ConnectionSettings.getInstance();
+    private RemoteServer _pairedServer;
 
-    public NetClient(int portNum) {
-        _connectionPortNum = portNum;
+    public NetClient() {
+
     }
 
-    public void initialize() throws Exception {
-        sendBroadcastMessage(_serverWelcomeMessage.getBytes());
+    public void pairWithServer() throws Exception {
+        sendBroadcastMessage(_settings.getWelcomeMessage().getBytes());
         DatagramPacket serverResponse = getServerResponse();
-        _connectionServerAddress = serverResponse.getAddress();
+        _pairedServer = new RemoteServer(serverResponse.getAddress());
     }
 
     public String getServerAddress() {
-        return _connectionServerAddress.getHostAddress();
+        return _pairedServer.getAddress().getHostAddress();
     }
 
 
     public void sendMessageToServer(String message) throws NetClientServerNotConnectedException, NetClientBroadcastException {
-        if (_connectionServerAddress == null) {
+        if (_pairedServer == null) {
             throw new NetClientServerNotConnectedException("Initialize connection before sending message");
         }
 
         byte[] sentMessage = message.getBytes();
-        try (DatagramSocket dSocket = new DatagramSocket(_connectionPortNum)) {
-            DatagramPacket packet = new DatagramPacket(sentMessage, sentMessage.length, _connectionServerAddress, _connectionPortNum);
+        try (DatagramSocket dSocket = new DatagramSocket(_settings.getPortNumber())) {
+            DatagramPacket packet = new DatagramPacket(sentMessage, sentMessage.length, _pairedServer.getAddress(), _settings.getPortNumber());
             dSocket.send(packet);
         } catch (SocketException e) {
             throw new NetClientBroadcastException(String.format("Cannot send packet because of socket error: %s", e));
@@ -69,7 +67,7 @@ public class NetClient {
     private void broadcastToAllInterfaceAddresses(byte[] sendData, NetworkInterface networkInterface)
             throws NetClientBroadcastException {
         try (DatagramSocket c = new DatagramSocket(null)) {
-            c.setSoTimeout(_serverResponseTimeoutMs);
+            c.setSoTimeout(_settings.getServerResponseTimeout());
             List<InterfaceAddress> addresses = networkInterface.getInterfaceAddresses();
             Log.d("NetClient", String.format("%d addresses found", addresses.size()));
             if (!sendMessagesThroughIteratorElements(false, sendData, c, addresses.iterator())) {
@@ -97,13 +95,13 @@ public class NetClient {
 
     private void sendMessageToInterfaceAddress(byte[] sendData, DatagramSocket c, InterfaceAddress interfaceAddress) throws IOException {
         InetAddress broadcast = interfaceAddress.getBroadcast();
-        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, broadcast, _connectionPortNum);
+        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, broadcast, _settings.getPortNumber());
         c.send(sendPacket);
     }
 
     private DatagramPacket getServerResponse() throws NetClientServerResponseException {
-        try (DatagramSocket c = new DatagramSocket(_connectionPortNum)) {
-            c.setSoTimeout(_serverResponseTimeoutMs);
+        try (DatagramSocket c = new DatagramSocket(_settings.getPortNumber())) {
+            c.setSoTimeout(_settings.getServerResponseTimeout());
             byte[] respondBuff = new byte[100];
             DatagramPacket packet = new DatagramPacket(respondBuff, respondBuff.length);
             c.receive(packet);
