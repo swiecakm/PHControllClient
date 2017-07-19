@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity implements OnConnectionCompl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         InitializeUIComponents();
+        _connectionClient = new NetClient();
     }
 
     private void InitializeUIComponents() {
@@ -46,12 +47,12 @@ public class MainActivity extends AppCompatActivity implements OnConnectionCompl
         sendCommandToServer("UP");
     }
 
-    public void onVolDownButtonClick(View view) {
+    public void onVolDownButtonClick(View view){
         sendCommandToServer("DOWN");
     }
 
     public void sendCommandToServer(String message) {
-        if (_connectionClient != null) {
+        if (_connectionClient.isPaired()) {
             SendMessageTask sendTask = new SendMessageTask(_connectionClient, message);
             sendTask.execute();
         } else
@@ -70,19 +71,16 @@ public class MainActivity extends AppCompatActivity implements OnConnectionCompl
     private void initializeServerConnection() {
         _serverAddressText.setText("Connecting with server...");
         _connectButton.setEnabled(false);
-        ConnectServerTask connectionTask = new ConnectServerTask(this);
+        ConnectServerTask connectionTask = new ConnectServerTask(_connectionClient, this);
         connectionTask.execute();
     }
 
     @Override
-    public void onConnectionCompleted(ConnectServerTaskResult result) {
-        if (result.isConnected()) {
-            _connectionClient = result.getServerConnection();
+    public void onConnectionCompleted() {
+        if (_connectionClient.isPaired()) {
             SetConnectionStatus(String.format("Connected with IP: %s", _connectionClient.getServerAddress()), true);
-            Log.d("MainActivity", String.format("Connected with server with address: %s", _connectionClient.getServerAddress()));
         } else {
             SetConnectionStatus("Could not connect. Please try again.", false);
-            Log.d("MainActivity", String.format("Not connected with server because of error: %s", result.getConnectionException()));
         }
         _connectButton.setEnabled(true);
     }

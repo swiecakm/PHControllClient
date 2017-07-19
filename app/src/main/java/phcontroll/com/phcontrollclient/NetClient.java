@@ -19,10 +19,18 @@ public class NetClient {
 
     }
 
-    public void pairWithServer() throws Exception {
-        sendBroadcastMessage(_settings.getWelcomeMessage().getBytes());
-        DatagramPacket serverResponse = getServerResponse();
-        _pairedServer = new RemoteServer(serverResponse.getAddress());
+    public void pairWithServer(){
+        try{
+            sendBroadcastMessage(_settings.getWelcomeMessage().getBytes());
+            DatagramPacket serverResponse = getServerResponse();
+            _pairedServer = new RemoteServer(serverResponse.getAddress());
+            Log.d("NetClient", String.format("Paired with server with address: %s", getServerAddress()));
+        }
+        catch (Exception e)
+        {
+            _pairedServer = null;
+            Log.d("NetClient", String.format("Cannot pair with server because of error: %s", e));
+        }
     }
 
     public String getServerAddress() {
@@ -32,7 +40,7 @@ public class NetClient {
 
     public void sendMessageToServer(String message) throws NetClientServerNotConnectedException, NetClientBroadcastException {
         if (_pairedServer == null) {
-            throw new NetClientServerNotConnectedException("Initialize connection before sending message");
+            throw new NetClientServerNotConnectedException("Pair with server before sending message");
         }
 
         byte[] sentMessage = message.getBytes();
@@ -48,13 +56,13 @@ public class NetClient {
 
     private void sendBroadcastMessage(byte[] sendData) throws NetClientBroadcastException {
         try {
-            BroadcastToAllWlanInterfaces(sendData);
+            BroadcastToAllWLANInterfaces(sendData);
         } catch (SocketException e) {
             throw new NetClientBroadcastException(String.format("Cannot get network interfaces: %s", e));
         }
     }
 
-    private void BroadcastToAllWlanInterfaces(byte[] sendData) throws SocketException, NetClientBroadcastException {
+    private void BroadcastToAllWLANInterfaces(byte[] sendData) throws SocketException, NetClientBroadcastException {
         Enumeration<NetworkInterface> interfaces = getNetworkInterfaces();
         while (interfaces.hasMoreElements()) {
             NetworkInterface networkInterface = interfaces.nextElement();
@@ -115,6 +123,9 @@ public class NetClient {
         }
     }
 
+    public boolean isPaired(){
+        return _pairedServer != null;
+    }
 }
 
 

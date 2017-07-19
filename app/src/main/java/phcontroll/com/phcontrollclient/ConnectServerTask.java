@@ -2,26 +2,23 @@ package phcontroll.com.phcontrollclient;
 
 import android.os.AsyncTask;
 
-public class ConnectServerTask extends AsyncTask<Void, Void, ConnectServerTaskResult> {
+public class ConnectServerTask extends AsyncTask<Void, Void, Void> {
     private OnConnectionCompleted _listener;
+    private NetClient _connectedClient;
 
-    public ConnectServerTask(OnConnectionCompleted listener) {
+    public ConnectServerTask(NetClient connectedClient, OnConnectionCompleted listener) {
         _listener = listener;
+        _connectedClient = connectedClient;
     }
 
     @Override
-    protected ConnectServerTaskResult doInBackground(Void... arg0) {
-        try {
-            NetClient connectionClient = new NetClient();
-            connectionClient.pairWithServer();
-            return new ConnectServerTaskResult(connectionClient);
-        } catch (Exception e) {
-            return new ConnectServerTaskResult(e);
-        }
+    protected Void doInBackground(Void... voids) {
+        _connectedClient.pairWithServer();
+        return null;
     }
 
     @Override
-    protected void onPostExecute(ConnectServerTaskResult result) {
-        _listener.onConnectionCompleted(result);
+    protected void onPostExecute(Void v) {
+        _listener.onConnectionCompleted();
     }
 }
