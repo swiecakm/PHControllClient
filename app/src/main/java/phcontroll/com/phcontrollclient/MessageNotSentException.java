@@ -1,9 +1,9 @@
 package phcontroll.com.phcontrollclient;
 
-public class SendMessageException extends Exception {
+public class MessageNotSentException extends Exception {
     private static final long serialVersionUID = -3279582061542873813L;
 
-    public SendMessageException(String message) {
+    public MessageNotSentException(String message) {
         super(message);
     }
 }

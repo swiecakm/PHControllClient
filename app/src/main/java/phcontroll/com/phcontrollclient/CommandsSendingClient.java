@@ -26,22 +26,22 @@ public class CommandsSendingClient {
     }
 
 
-    public void send(String message) throws NotPairedWithServerException, SendMessageException {
+    public void send(String message) throws NotPairedWithServerException, MessageNotSentException {
         if (_pairedServer == null)
             throw new NotPairedWithServerException("Pair with server before sending message");
 
         sendCommandToPairedServer(message);
     }
 
-    private void sendCommandToPairedServer(String message) throws SendMessageException {
+    private void sendCommandToPairedServer(String message) throws MessageNotSentException {
         try (DatagramSocket dSocket = new DatagramSocket(_pairedServer.getPortNumber())) {
             byte[] sentMessage = message.getBytes();
             DatagramPacket packet = new DatagramPacket(sentMessage, sentMessage.length, _pairedServer.getAddress(), _pairedServer.getPortNumber());
             dSocket.send(packet);
         } catch (SocketException e) {
-            throw new SendMessageException(String.format("Cannot send message because of socket error: %s", e));
+            throw new MessageNotSentException(String.format("Cannot send message because of socket error: %s", e));
         } catch (IOException e) {
-            throw new SendMessageException(String.format("Cannot send message because of IO error: %s", e));
+            throw new MessageNotSentException(String.format("Cannot send message because of IO error: %s", e));
         }
     }
 
