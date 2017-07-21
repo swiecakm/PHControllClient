@@ -4,10 +4,10 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 public class SendMessageTask extends AsyncTask<Void, Void, Void> {
-    private NetClient _connectionClient;
+    private CommandsSendingClient _connectionClient;
     private String _sendMessage;
 
-    public SendMessageTask(NetClient connectionClient, String message) {
+    public SendMessageTask(CommandsSendingClient connectionClient, String message) {
         _connectionClient = connectionClient;
         _sendMessage = message;
     }

@@ -14,10 +14,21 @@ import static java.net.NetworkInterface.getNetworkInterfaces;
 /**
  * Created by root on 21.07.17.
  */
-public class BroadcastServer {
+public class DiscoveryBroadcast {
     private ConnectionSettings _settings = ConnectionSettings.getInstance();
+    private RemoteServer _listeningServer;
 
-    public void sendMessage(byte[] sendData) throws NetClientBroadcastException {
+    public void detectListeningServer() throws NetClientBroadcastException, NetClientServerResponseException {
+        sendMessage(_settings.getWelcomeMessage().getBytes());
+        DatagramPacket serverResponse = getServerResponse();
+        _listeningServer = new RemoteServer(serverResponse.getAddress(), serverResponse.getPort());
+    }
+
+    public RemoteServer getListeningServer() {
+        return _listeningServer;
+    }
+
+    private void sendMessage(byte[] sendData) throws NetClientBroadcastException {
         try {
             BroadcastToAllWLANInterfaces(sendData);
         } catch (SocketException e) {
@@ -40,7 +51,7 @@ public class BroadcastServer {
         try (DatagramSocket c = new DatagramSocket(null)) {
             c.setSoTimeout(_settings.getServerResponseTimeout());
             List<InterfaceAddress> addresses = networkInterface.getInterfaceAddresses();
-            Log.d("BroadcastServer", String.format("%d addresses found", addresses.size()));
+            Log.d("BroadcastServerr", String.format("%d addresses found", addresses.size()));
             if (!sendMessagesForAddresses(false, sendData, c, addresses.iterator())) {
                 throw new NetClientBroadcastException("Broadcast message not sent to any address");
             }
@@ -54,10 +65,10 @@ public class BroadcastServer {
             InterfaceAddress address = iterator.next();
             try {
                 sendMessageToInterfaceAddress(sendData, c, address);
-                Log.d("BroadcastServer", String.format("Broadcast message sent for address %s", address.getAddress().toString()));
+                Log.d("BroadcastServerr", String.format("Broadcast message sent for address %s", address.getAddress().toString()));
                 atLeastOneSent = sendMessagesForAddresses(true, sendData, c, iterator);
             } catch (Exception e) {
-                Log.d("BroadcastServer", String.format("Can not send the message to address %s because of error: %s", address.getAddress().toString(), e));
+                Log.d("BroadcastServerr", String.format("Can not send the message to address %s because of error: %s", address.getAddress().toString(), e));
                 atLeastOneSent = sendMessagesForAddresses(atLeastOneSent, sendData, c, iterator);
             }
         }
@@ -70,7 +81,7 @@ public class BroadcastServer {
         c.send(sendPacket);
     }
 
-    public DatagramPacket getServerResponse() throws NetClientServerResponseException {
+    private DatagramPacket getServerResponse() throws NetClientServerResponseException {
         try (DatagramSocket c = new DatagramSocket(_settings.getPortNumber())) {
             c.setSoTimeout(_settings.getServerResponseTimeout());
             byte[] respondBuff = new byte[100];
@@ -85,4 +96,5 @@ public class BroadcastServer {
             throw new NetClientServerResponseException(String.format("Receiving server response error: %s", e));
         }
     }
+
 }

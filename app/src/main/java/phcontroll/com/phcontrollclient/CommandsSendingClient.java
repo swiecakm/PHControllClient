@@ -5,26 +5,23 @@ import android.util.Log;
 import java.io.IOException;
 import java.net.*;
 
-public class NetClient {
-    private ConnectionSettings _settings = ConnectionSettings.getInstance();
+public class CommandsSendingClient {
     private RemoteServer _pairedServer;
 
-    public NetClient() {
+    public CommandsSendingClient() {
 
     }
 
     public void pairWithServer(){
         try{
-            BroadcastServer broadcast = new BroadcastServer();
-            broadcast.sendMessage(_settings.getWelcomeMessage().getBytes());
-            DatagramPacket serverResponse = broadcast.getServerResponse();
-            _pairedServer = new RemoteServer(serverResponse.getAddress());
-            Log.d("NetClient", String.format("Paired with server with address: %s", getServerAddress()));
+            DiscoveryBroadcast broadcast = new DiscoveryBroadcast();
+            broadcast.detectListeningServer();
+            _pairedServer = broadcast.getListeningServer();
+            Log.d("CommandsSendingClient", String.format("Paired with server with address: %s", getServerAddress()));
         }
-        catch (Exception e)
-        {
+        catch (Exception e){
             _pairedServer = null;
-            Log.d("NetClient", String.format("Cannot pair with server because of error: %s", e));
+            Log.d("CommandsSendingClient", String.format("Cannot pair with server because of error: %s", e));
         }
     }
 
@@ -39,8 +36,8 @@ public class NetClient {
         }
 
         byte[] sentMessage = message.getBytes();
-        try (DatagramSocket dSocket = new DatagramSocket(_settings.getPortNumber())) {
-            DatagramPacket packet = new DatagramPacket(sentMessage, sentMessage.length, _pairedServer.getAddress(), _settings.getPortNumber());
+        try (DatagramSocket dSocket = new DatagramSocket(_pairedServer.getPortNumber())) {
+            DatagramPacket packet = new DatagramPacket(sentMessage, sentMessage.length, _pairedServer.getAddress(), _pairedServer.getPortNumber());
             dSocket.send(packet);
         } catch (SocketException e) {
             throw new NetClientBroadcastException(String.format("Cannot send packet because of socket error: %s", e));
@@ -48,8 +45,6 @@ public class NetClient {
             throw new NetClientBroadcastException(String.format("Cannot send packet because of IO error: %s", e));
         }
     }
-
-
 
     public boolean isPaired(){
         return _pairedServer != null;

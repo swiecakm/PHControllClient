@@ -4,9 +4,9 @@ import android.os.AsyncTask;
 
 public class ConnectServerTask extends AsyncTask<Void, Void, Void> {
     private OnConnectionCompleted _listener;
-    private NetClient _connectedClient;
+    private CommandsSendingClient _connectedClient;
 
-    public ConnectServerTask(NetClient connectedClient, OnConnectionCompleted listener) {
+    public ConnectServerTask(CommandsSendingClient connectedClient, OnConnectionCompleted listener) {
         _listener = listener;
         _connectedClient = connectedClient;
     }

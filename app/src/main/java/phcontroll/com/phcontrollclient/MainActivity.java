@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 public class MainActivity extends AppCompatActivity implements OnConnectionCompleted {
-    private NetClient _connectionClient = null;
+    private CommandsSendingClient _connectionClient = null;
     private Button _volUpButton;
     private Button _volDownButton;
     private Button _connectButton;
@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity implements OnConnectionCompl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         InitializeUIComponents();
-        _connectionClient = new NetClient();
+        _connectionClient = new CommandsSendingClient();
     }
 
     private void InitializeUIComponents() {
