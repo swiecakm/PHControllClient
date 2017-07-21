@@ -44,16 +44,16 @@ public class MainActivity extends AppCompatActivity implements OnConnectionCompl
     }
 
     public void onVolUpButtonClick(View view) {
-        sendCommandToServer("UP");
+        sendCommandToServer(Commands.VOL_UP);
     }
 
     public void onVolDownButtonClick(View view){
-        sendCommandToServer("DOWN");
+        sendCommandToServer(Commands.VOL_DOWN);
     }
 
-    public void sendCommandToServer(String message) {
+    public void sendCommandToServer(Commands command) {
         if (_connectionClient.isPaired()) {
-            SendMessageTask sendTask = new SendMessageTask(_connectionClient, message);
+            SendMessageTask sendTask = new SendMessageTask(_connectionClient, command);
             sendTask.execute();
         } else
             Log.d("MainActivity", "Connect with server before sending command!");

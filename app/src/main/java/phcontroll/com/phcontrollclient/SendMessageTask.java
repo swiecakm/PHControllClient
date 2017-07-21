@@ -5,17 +5,17 @@ import android.util.Log;
 
 public class SendMessageTask extends AsyncTask<Void, Void, Void> {
     private CommandsSendingClient _connectionClient;
-    private String _sendMessage;
+    private Commands _command;
 
-    public SendMessageTask(CommandsSendingClient connectionClient, String message) {
+    public SendMessageTask(CommandsSendingClient connectionClient, Commands command) {
         _connectionClient = connectionClient;
-        _sendMessage = message;
+        _command = command;
     }
 
     @Override
     protected Void doInBackground(Void... arg0) {
         try {
-            _connectionClient.send(_sendMessage);
+            _connectionClient.send(_command);
         } catch (Exception e) {
             Log.d("SendMessageTask", "Cannot send message!: " + e);
         }

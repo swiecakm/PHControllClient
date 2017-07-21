@@ -26,16 +26,16 @@ public class CommandsSendingClient {
     }
 
 
-    public void send(String message) throws NotPairedWithServerException, MessageNotSentException {
+    public void send(Commands command) throws NotPairedWithServerException, MessageNotSentException {
         if (_pairedServer == null)
             throw new NotPairedWithServerException("Pair with server before sending message");
 
-        sendCommandToPairedServer(message);
+        sendCommandToPairedServer(command);
     }
 
-    private void sendCommandToPairedServer(String message) throws MessageNotSentException {
+    private void sendCommandToPairedServer(Commands command) throws MessageNotSentException {
         try (DatagramSocket dSocket = new DatagramSocket(_pairedServer.getPortNumber())) {
-            byte[] sentMessage = message.getBytes();
+            byte[] sentMessage = command.getBytes();
             DatagramPacket packet = new DatagramPacket(sentMessage, sentMessage.length, _pairedServer.getAddress(), _pairedServer.getPortNumber());
             dSocket.send(packet);
         } catch (SocketException e) {
