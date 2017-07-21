@@ -27,10 +27,13 @@ public class CommandsSendingClient {
 
 
     public void send(String message) throws NetClientServerNotConnectedException, NetClientBroadcastException {
-        if (_pairedServer == null) {
+        if (_pairedServer == null)
             throw new NetClientServerNotConnectedException("Pair with server before sending message");
-        }
 
+        sendCommandToPairedServer(message);
+    }
+
+    private void sendCommandToPairedServer(String message) throws NetClientBroadcastException {
         try (DatagramSocket dSocket = new DatagramSocket(_pairedServer.getPortNumber())) {
             byte[] sentMessage = message.getBytes();
             DatagramPacket packet = new DatagramPacket(sentMessage, sentMessage.length, _pairedServer.getAddress(), _pairedServer.getPortNumber());
