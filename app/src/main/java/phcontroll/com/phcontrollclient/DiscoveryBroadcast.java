@@ -51,7 +51,7 @@ public class DiscoveryBroadcast {
         try (DatagramSocket c = new DatagramSocket(null)) {
             c.setSoTimeout(_settings.getServerResponseTimeout());
             List<InterfaceAddress> addresses = networkInterface.getInterfaceAddresses();
-            Log.d("BroadcastServerr", String.format("%d addresses found", addresses.size()));
+            Log.d("DiscoveryBroadcast", String.format("%d addresses found", addresses.size()));
             if (!sendMessagesForAddresses(false, sendData, c, addresses.iterator())) {
                 throw new SendMessageException("Broadcast message not sent to any address");
             }
@@ -66,10 +66,10 @@ public class DiscoveryBroadcast {
             InterfaceAddress address = iterator.next();
             try {
                 sendMessageToInterfaceAddress(sendData, c, address);
-                Log.d("BroadcastServerr", String.format("Broadcast message sent for address %s", address.getAddress().toString()));
+                Log.d("DiscoveryBroadcast", String.format("Broadcast message sent for address %s", address.getAddress().toString()));
                 atLeastOneSent = sendMessagesForAddresses(true, sendData, c, iterator);
             } catch (Exception e) {
-                Log.d("BroadcastServerr", String.format("Can not send the message to address %1$s because of error: $2$s", address.getAddress().toString(), e));
+                Log.d("DiscoveryBroadcast", String.format("Can not send the message to address %1$s because of error: $2$s", address.getAddress().toString(), e));
                 atLeastOneSent = sendMessagesForAddresses(atLeastOneSent, sendData, c, iterator);
             }
         }

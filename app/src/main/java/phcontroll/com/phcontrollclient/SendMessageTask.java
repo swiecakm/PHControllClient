@@ -17,7 +17,7 @@ public class SendMessageTask extends AsyncTask<Void, Void, Void> {
         try {
             _connectionClient.send(_sendMessage);
         } catch (Exception e) {
-            Log.d("MainActivity", "Cannot send message!: " + e);
+            Log.d("SendMessageTask", "Cannot send message!: " + e);
         }
         return null;
     }
