@@ -18,25 +18,25 @@ public class DiscoveryBroadcast {
     private ConnectionSettings _settings = ConnectionSettings.getInstance();
     private RemoteServer _listeningServer;
 
-    public void detectListeningServer() throws NetClientBroadcastException, NetClientServerResponseException {
-        sendMessage(_settings.getWelcomeMessage().getBytes());
-        DatagramPacket serverResponse = getServerResponse();
-        _listeningServer = new RemoteServer(serverResponse.getAddress(), serverResponse.getPort());
+    public void detectListeningServer() throws SendMessageException, ServerResponseTimeoutException {
+        try {
+            sendMessage(_settings.getWelcomeMessage().getBytes());
+            DatagramPacket serverResponse = getServerResponse();
+            _listeningServer = new RemoteServer(serverResponse.getAddress(), serverResponse.getPort());
+        } catch (IOException e) {
+            Log.e("DiscoveryBroadcast",String.format("Detecting server error: %s", e));
+        }
     }
 
     public RemoteServer getListeningServer() {
         return _listeningServer;
     }
 
-    private void sendMessage(byte[] sendData) throws NetClientBroadcastException {
-        try {
-            BroadcastToAllWLANInterfaces(sendData);
-        } catch (SocketException e) {
-            throw new NetClientBroadcastException(String.format("Cannot get network interfaces: %s", e));
-        }
+    private void sendMessage(byte[] sendData) throws SendMessageException, SocketException {
+        BroadcastToAllWLANInterfaces(sendData);
     }
 
-    private void BroadcastToAllWLANInterfaces(byte[] sendData) throws SocketException, NetClientBroadcastException {
+    private void BroadcastToAllWLANInterfaces(byte[] sendData) throws SocketException, SendMessageException {
         Enumeration<NetworkInterface> interfaces = getNetworkInterfaces();
         while (interfaces.hasMoreElements()) {
             NetworkInterface networkInterface = interfaces.nextElement();
@@ -47,16 +47,17 @@ public class DiscoveryBroadcast {
     }
 
     private void broadcastToAllInterfaceAddresses(byte[] sendData, NetworkInterface networkInterface)
-            throws NetClientBroadcastException {
+            throws SendMessageException {
         try (DatagramSocket c = new DatagramSocket(null)) {
             c.setSoTimeout(_settings.getServerResponseTimeout());
             List<InterfaceAddress> addresses = networkInterface.getInterfaceAddresses();
             Log.d("BroadcastServerr", String.format("%d addresses found", addresses.size()));
             if (!sendMessagesForAddresses(false, sendData, c, addresses.iterator())) {
-                throw new NetClientBroadcastException("Broadcast message not sent to any address");
+                throw new SendMessageException("Broadcast message not sent to any address");
             }
         } catch (SocketException e) {
-            throw new NetClientBroadcastException(String.format("Socket initialization exception: %s", e.getMessage()));
+            Log.e("DiscoveryBroadcast", String.format("Broadcast not sent for interface: %1$s because of socket error: $2$s",
+                    networkInterface, e));
         }
     }
 
@@ -68,7 +69,7 @@ public class DiscoveryBroadcast {
                 Log.d("BroadcastServerr", String.format("Broadcast message sent for address %s", address.getAddress().toString()));
                 atLeastOneSent = sendMessagesForAddresses(true, sendData, c, iterator);
             } catch (Exception e) {
-                Log.d("BroadcastServerr", String.format("Can not send the message to address %s because of error: %s", address.getAddress().toString(), e));
+                Log.d("BroadcastServerr", String.format("Can not send the message to address %1$s because of error: $2$s", address.getAddress().toString(), e));
                 atLeastOneSent = sendMessagesForAddresses(atLeastOneSent, sendData, c, iterator);
             }
         }
@@ -81,7 +82,7 @@ public class DiscoveryBroadcast {
         c.send(sendPacket);
     }
 
-    private DatagramPacket getServerResponse() throws NetClientServerResponseException {
+    private DatagramPacket getServerResponse() throws ServerResponseTimeoutException, IOException {
         try (DatagramSocket c = new DatagramSocket(_settings.getPortNumber())) {
             c.setSoTimeout(_settings.getServerResponseTimeout());
             byte[] respondBuff = new byte[100];
@@ -89,11 +90,7 @@ public class DiscoveryBroadcast {
             c.receive(packet);
             return packet;
         } catch (InterruptedIOException e) {
-            throw new NetClientServerResponseException(String.format("Waiting for server too long: %s", e.getMessage()));
-        } catch (IOException e) {
-            throw new NetClientServerResponseException(String.format("Receiving server response error: %s", e.getMessage()));
-        } catch (Exception e) {
-            throw new NetClientServerResponseException(String.format("Receiving server response error: %s", e));
+            throw new ServerResponseTimeoutException(String.format("Waiting for server too long: %s", e));
         }
     }
 
