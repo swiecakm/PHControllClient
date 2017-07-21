@@ -8,10 +8,6 @@ import java.net.*;
 public class CommandsSendingClient {
     private RemoteServer _pairedServer;
 
-    public CommandsSendingClient() {
-
-    }
-
     public void pairWithServer(){
         try{
             DiscoveryBroadcast broadcast = new DiscoveryBroadcast();
@@ -30,13 +26,13 @@ public class CommandsSendingClient {
     }
 
 
-    public void sendMessageToServer(String message) throws NetClientServerNotConnectedException, NetClientBroadcastException {
+    public void send(String message) throws NetClientServerNotConnectedException, NetClientBroadcastException {
         if (_pairedServer == null) {
             throw new NetClientServerNotConnectedException("Pair with server before sending message");
         }
 
-        byte[] sentMessage = message.getBytes();
         try (DatagramSocket dSocket = new DatagramSocket(_pairedServer.getPortNumber())) {
+            byte[] sentMessage = message.getBytes();
             DatagramPacket packet = new DatagramPacket(sentMessage, sentMessage.length, _pairedServer.getAddress(), _pairedServer.getPortNumber());
             dSocket.send(packet);
         } catch (SocketException e) {

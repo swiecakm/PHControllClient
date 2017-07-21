@@ -15,7 +15,7 @@ public class SendMessageTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... arg0) {
         try {
-            _connectionClient.sendMessageToServer(_sendMessage);
+            _connectionClient.send(_sendMessage);
         } catch (Exception e) {
             Log.d("MainActivity", "Cannot send message!: " + e);
         }
