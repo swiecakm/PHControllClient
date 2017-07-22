@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/activity_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -16,7 +16,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/server_ip_label" android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"/>
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="30dp"/>
     <EditText
             android:id="@+id/serverAddressText"
             android:layout_width="wrap_content"
@@ -35,7 +36,7 @@
 
     <Button
             android:id="@+id/connectButton"
-            android:background="@drawable/connect_button"
+            android:background="@drawable/connect_button_shape"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/serverAddressText"
@@ -43,49 +44,31 @@
             android:onClick="onConnectButtonClick"
             android:text="PAIR WITH COMPUTER" />
 
+
     <GridLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/connectButton"
-            android:layout_below="@+id/connectButton"
-            android:layout_marginTop="50dp"
-            android:alignmentMode="alignMargins"
-            android:columnCount="3" >
-
-        <GridLayout
-                android:layout_column="2"
-                android:layout_gravity="right|top"
-                android:layout_row="0"
-                android:columnCount="2" >
-
-            <Button
-                    android:id="@+id/volDownButton"
-                    android:layout_gravity="left"
-                    android:text="-"
-                    android:onClick="onVolDownButtonClick" />
-
-
-            <Button
-                    android:id="@+id/volUpButton"
-                    android:layout_column="1"
-                    android:layout_gravity="left|top"
-                    android:layout_row="0"
-                    android:text="+"
-                    android:onClick="onVolUpButtonClick" />
-
-        </GridLayout>
-
-        <TextView
-                android:id="@+id/volumeLabel"
-                android:layout_width="150dp"
-                android:layout_column="1"
-                android:layout_gravity="left|center_vertical"
-                android:layout_row="0"
-                android:gravity="right"
-                android:text="Volume"
-                android:textSize="@dimen/BiggerText3"
-                android:textStyle="bold" />
-
+            android:layout_height="match_parent" android:layout_below="@+id/connectButton"
+            android:layout_alignParentStart="true" android:layout_marginTop="50dp">
+        <ImageButton
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/vol_down"
+                android:background="@drawable/media_button_shape"
+                android:id="@+id/volDownButton"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="1dp"
+                android:onClick="onVolDownButtonClick"/>
+        <ImageButton
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/vol_up"
+                android:background="@drawable/media_button_shape"
+                android:id="@+id/volUpButton"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="1dp"
+                android:onClick="onVolUpButtonClick"/>
     </GridLayout>
 
 </RelativeLayout>

@@ -8,11 +8,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 public class MainActivity extends AppCompatActivity implements OnConnectionCompleted {
     private CommandsSendingClient _connectionClient = null;
-    private Button _volUpButton;
-    private Button _volDownButton;
+    private ImageButton _volUpButton;
+    private ImageButton _volDownButton;
     private Button _connectButton;
     private EditText _serverAddressText;
 
@@ -31,8 +32,8 @@ public class MainActivity extends AppCompatActivity implements OnConnectionCompl
 
     private void retrieveWidgets() {
         _serverAddressText = (EditText) findViewById(R.id.serverAddressText);
-        _volUpButton = (Button) findViewById(R.id.volUpButton);
-        _volDownButton = (Button) findViewById(R.id.volDownButton);
+        _volUpButton = (ImageButton) findViewById(R.id.volUpButton);
+        _volDownButton = (ImageButton) findViewById(R.id.volDownButton);
         _connectButton = (Button) findViewById(R.id.connectButton);
     }
 
