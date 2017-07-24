@@ -52,6 +52,16 @@ public class MainActivity extends AppCompatActivity implements OnConnectionCompl
         sendCommandToServer(Commands.VOL_DOWN);
     }
 
+    public void onMuteButtonClick(View view) { sendCommandToServer(Commands.MUTE); }
+
+    public void onPlayPauseButtonClick(View view) { sendCommandToServer(Commands.PLAY_PAUSE); }
+
+    public void onStopButtonClick(View view) { sendCommandToServer(Commands.STOP); }
+
+    public void onPreviousButtonClick(View view) { sendCommandToServer(Commands.PREVIOUS); }
+
+    public void onNextButtonClick(View view) { sendCommandToServer(Commands.NEXT); }
+    
     public void sendCommandToServer(Commands command) {
         if (_connectionClient.isPaired()) {
             SendMessageTask sendTask = new SendMessageTask(_connectionClient, command);
@@ -91,5 +101,4 @@ public class MainActivity extends AppCompatActivity implements OnConnectionCompl
         _volUpButton.setEnabled(volumeButtonsEnabled);
         _volDownButton.setEnabled(volumeButtonsEnabled);
     }
-
 }

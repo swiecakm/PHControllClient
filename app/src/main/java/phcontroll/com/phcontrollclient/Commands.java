@@ -7,7 +7,12 @@ import org.jetbrains.annotations.Contract;
  */
 public enum Commands {
     VOL_UP("UP"),
-    VOL_DOWN("DOWN");
+    VOL_DOWN("DOWN"),
+    MUTE("MUTE"),
+    PLAY_PAUSE("PLAY_PAUSE"),
+    STOP("STOP"),
+    PREVIOUS("PREVIOUS"),
+    NEXT("NEXT");
 
     private String _text;
 
